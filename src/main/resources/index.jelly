@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    This plugin allows Jenkins freestyle jobs to trigger Rocket DevOps core for IBM i pipelines. Results are displayed in the Jenkins job log.
+</div>

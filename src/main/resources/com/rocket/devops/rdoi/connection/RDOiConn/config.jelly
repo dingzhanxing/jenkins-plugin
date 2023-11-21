@@ -1,0 +1,14 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:st="jelly:stapler">
+    <f:entry title="${%Connection name}" field="name" description="${%A name for the connection}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry title="${%RDOp service host URL}" field="url" description="${%The complete  URL to the RDOp service} (${%e.g. http://rocketsoftware.com:8890})">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%Credential}" field="credentialId" description="${%Credential for accessing RDOp service}">
+      <c:select/>
+    </f:entry>
+    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection"
+                      with="url,credentialId"/>
+</j:jelly>

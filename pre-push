@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# aldongit pre-push for Windows
+# rename this file as pre-push and place in .git/hooks
+# uncomment the DEBUG line to see some debug information
+# export DEBUG=1
+
+# Select the aldongit-windows.pl from 32-bit or 64-bit path
+ALD_PATH_32="C:/Program Files (x86)/Rocket Software/Rocket DevOps GUI"
+ALD_PATH_64="C:/Program Files/Rocket Software/Rocket DevOps GUI"
+ALDONGIT_PL="aldongit/aldongit-windows.pl"
+
+if [ -f "${ALD_PATH_64}/ald.exe" ]; then 
+	ALDONGIT="${ALD_PATH_64}/${ALDONGIT_PL}"
+else 
+	if [ -f "${ALD_PATH_32}/ald.exe" ]; then
+		ALDONGIT="${ALD_PATH_32}/${ALDONGIT_PL}"
+	else 
+		echo "The ald.exe file doesn't exist in Rocket DevOps GUI. Exiting."
+		exit 1
+	fi
+fi
+
+z40=0000000000000000000000000000000000000000
+
+while read local_ref local_sha remote_ref remote_sha
+do
+
+   if [[ $DEBUG ]]; then
+      echo "Local ref is $local_ref"
+      echo "Local sha is $local_sha"
+      echo "Remote ref is $remote_ref"
+      echo "Remote SHA is $remote_sha"
+   fi
+
+   if [ $local_sha = "$z40" ]; then
+      # handle delete
+      if [[ $DEBUG ]]; then echo "Local SHA is 40 zeroes; handle delete."; fi
+      :
+   else
+      if [ $remote_sha = "$z40" ]; then
+         # new branch, examine all commits
+         if [[ $DEBUG ]]; then echo "Remote SHA is 40 zeroes; new branch detected ..."; fi
+	 :
+      else 
+         # update to existing branch, examine new commits
+         if [[ $DEBUG ]]; then echo "Checking commits in pre-push ..."; fi
+         "$ALDONGIT" --prepush $local_sha $remote_sha
+      fi
+   fi
+
+   # if there was an error pushing to LMe exit to prevent push to remote git repo
+   EXIT_STATUS=$?
+   if [ $EXIT_STATUS -ne 0 ]; then
+      echo "Error output during push: \"$EXIT_STATUS\"; exiting ..." 
+      exit 1
+   fi
+done
+
+exit 0
