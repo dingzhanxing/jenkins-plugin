@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.rocketsoftware.rdoe.dao.rdoe.mapper.DeploymentMapper">
+	
+	<resultMap id="getDeploymentListResultMap"
+		type="com.rocketsoftware.rdoe.controller.vo.deployment.DeploymentListVo">
+		<result column="LSTREQSTP" jdbcType="INTEGER" property="lstreqstp" />
+		<result column="LSTREQSTAT" jdbcType="INTEGER" property="lstreqstat" />
+		<result column="DSTSTATCDE" jdbcType="INTEGER" property="dststatcde" />
+		<result column="CPTRNM" jdbcType="VARCHAR" property="destinationComputerName" />
+		<result column="DSTTGTNM" jdbcType="VARCHAR" property="destinationTargetName" />
+		<result column="DSTPRFNM" jdbcType="VARCHAR" property="deploymentProfileName" />
+		<result column="DSTPRFID" jdbcType="INTEGER" property="deploymentProfileId" />
+		<result column="DSTNTFYTIM" jdbcType="TIMESTAMP" property="dstntfytim" />
+		<result column="DSTSETNM" jdbcType="VARCHAR" property="deploymentSetName" />
+		<result column="DSTSETID" jdbcType="INTEGER" property="deploymentSetId" />
+		<result column="DSTDESSTP" jdbcType="VARCHAR" property="deploymentStep" />
+		<result column="DSTSTATVAL" jdbcType="VARCHAR" property="dststatval" />
+		<result column="EFFSTRTS" jdbcType="TIMESTAMP" property="lastChangedDate" />
+		<result column="CPTRID" jdbcType="INTEGER" property="destinationComputerId" />
+		<result column="DSTTGTID" jdbcType="INTEGER" property="destinationTargetId" />
+
+	</resultMap>
+
+	<resultMap id="deploymentProfileSetsMap"
+			   type="com.rocketsoftware.rdoe.controller.vo.deployment.DeploymentListVo">
+		<result column="LSTREQSTP" jdbcType="INTEGER" property="lstreqstp" />
+		<result column="LSTREQSTAT" jdbcType="INTEGER" property="lstreqstat" />
+		<result column="DSTSTATCDE" jdbcType="INTEGER" property="dststatcde" />
+
+		<result column="DSTNTFYTIM" jdbcType="TIMESTAMP" property="dstntfytim" />
+		<result column="DSTSETNM" jdbcType="VARCHAR" property="deploymentName" />
+		<result column="DSTSETID" jdbcType="INTEGER" property="deploymentSetId" />
+
+		<result column="DEPLOYMENTSETSTEP" jdbcType="VARCHAR" property="deploymentSetStep" />
+		<result column="DEPLOYMENTSETSTATUS" jdbcType="VARCHAR" property="deploymentSetStatus" />
+		<result column="STATECHANGETIMESTAMP" jdbcType="TIMESTAMP" property="stateChangeTimeStamp" />
+	</resultMap>
+
+	<resultMap id="targetInfoMap"
+			   type="com.rocketsoftware.rdoe.dao.rdoe.model.deployment.TargetModel">
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+		<result column="OSNAME" jdbcType="VARCHAR" property="osName" />
+
+		<result column="OSDESCRIPTION" jdbcType="VARCHAR" property="osDescription" />
+		<result column="OSVERSION" jdbcType="VARCHAR" property="osVersion" />
+		<result column="OSVERSIONDESCRIPTION" jdbcType="VARCHAR" property="osVersionDescription" />
+
+		<result column="DMSTATUS" jdbcType="INTEGER" property="dmStatus" />
+		<result column="DMEXTERNAL" jdbcType="CHAR" property="dmExternal" />
+		<result column="HOSTNAME" jdbcType="VARCHAR" property="host" />
+		<result column="PORT" jdbcType="INTEGER" property="port" />
+
+		<result column="DISTSERVER" jdbcType="VARCHAR" property="distServer" />
+
+	</resultMap>
+
+	<resultMap id="deploymentSetMap" type="com.rocketsoftware.rdoe.dao.rdoe.model.DeploymentSetModel">
+		<result column="DSTSETID" jdbcType="INTEGER" property="id"/>
+		<result column="DSTSETNM" jdbcType="VARCHAR" property="name"/>
+		<result column="DSTDESSTTS" jdbcType="TIMESTAMP" property="date"/>
+		<result column="DSTNTFYTIM" jdbcType="TIMESTAMP" property="ntfyTime"/>
+		<result column="DSTDESSTPNM" jdbcType="VARCHAR" property="destinationStep"/>
+		<result column="DSTSTATCDENM" jdbcType="VARCHAR" property="destinationStatus"/>
+		<result column="DSTDESSTP" jdbcType="VARCHAR" property="destinationStepCode"/>
+		<result column="DSTSTATCDE" jdbcType="VARCHAR" property="destinationStatusCode"/>
+		<result column="RECOVCNT" jdbcType="INTEGER" property="recoverCount"/>
+	</resultMap>
+
+	<resultMap id="DeploymentProfileStepDetailsMap"
+			   type="com.rocketsoftware.rdoe.dao.rdoe.model.DeploymentProfileModel">
+		<id column="DSTPRFID" jdbcType="INTEGER" property="distributionProfileId" />
+		<result column="DSTPRFNM" jdbcType="CHAR" property="distributionProfileName" />
+		<result column="DSTPRFDSC" jdbcType="CHAR" property="distributionProfileDesc" />
+		<result column="AUTOSTR" jdbcType="CHAR" property="distributionAutoStart" />
+	</resultMap>
+	<resultMap id="OperationSystemModelResultMap"
+			   type="com.rocketsoftware.rdoe.dao.rdoe.model.OperationSystemModel">
+		<id column="OSID" jdbcType="INTEGER" property="osId" />
+		<result column="OSNM" jdbcType="CHAR" property="osName" />
+		<result column="OSNMKY" jdbcType="CHAR" property="osNameKey" />
+		<result column="OSTYP" jdbcType="CHAR" property="osType" />
+		<result column="OSDSC" jdbcType="CHAR" property="osDescription" />
+	</resultMap>
+
+	<select id="getOperationSystemList" resultMap="OperationSystemModelResultMap">
+		SELECT OSID,
+		TRIM(OSNM) AS OSNM,
+		TRIM(OSNMKY) AS OSNMKY,
+		OSTYP,
+		TRIM(OSDSC) AS OSDSC
+		FROM OPSYS
+		WHERE 1=1
+	</select>
+
+	<select id="getTargetInfo" resultMap="targetInfoMap" >
+		SELECT
+		c.CPTRNM AS name,
+		c.CPTRDSC AS description,
+		o.OSNM AS osName,
+		o.OSDSC AS osDescription,
+		v.OSVER AS osVersion,
+		v.OSVERDSC AS osVersionDescription,
+		u.DMEXTERNAL,
+		u.USYSTEM AS hostname,
+		u.PORTNUMBER AS port,
+		u.DISTSERVER,
+		u.DMSTATUS
+		FROM
+		computer c
+		LEFT JOIN users u ON
+		u.UALIAS = c.CPTRNM
+		LEFT JOIN OPSYS o ON
+		c.OSID = o.OSID
+		LEFT JOIN OPSYSVER v ON
+		c.OSVERID = v.OSVERID
+		WHERE
+		c.CPTRNMKY = #{targetId}
+		AND c.ROWVERTYP = 0
+	</select>
+
+	<select id="getDeploymentProfileSets" resultMap="deploymentProfileSetsMap">
+		SELECT
+		DISTINCT DS.LSTREQSTP,
+		DS.LSTREQSTAT,
+		DS.DSTSTATCDE,
+		DS.DSTSETID,
+		DS.DSTSETNM AS DEPLOYMENTSETNAME,
+		DS.STETS AS STATECHANGETIMESTAMP,
+		E3.ENMVAL DEPLOYMENTSETSTEP,
+		COALESCE(E2.ENMVAL,
+		E4.ENMVAL) DEPLOYMENTSETSTATUS,
+		DS.DSTNTFYTIM
+		FROM
+		DSTSET DS
+		JOIN DSTPRF DP ON
+		DP.DSTPRFID = DS.DSTPRFID
+		LEFT JOIN DSTDES D ON
+		DS.DSTSETID = D.DSTSETID
+		AND D.ROWVERTYP = 0
+		LEFT JOIN ENMVALS E2 ON
+		DS.DSTSTATCDE = E2.ENM
+		AND E2.COLNM = 'DSTSTATCDE'
+		JOIN ENMVALS E3 ON
+		DS.LSTCMPSTP = E3.ENM
+		AND E3.COLNM = 'LSTCMPSTP'
+		JOIN ENMVALS E4 ON
+		DS.LSTCMPSTAT = E4.ENM
+		AND E4.COLNM = 'LSTCMPSTAT'
+		WHERE
+		DS.DSTPRFID = #{profileId}
+		AND DS.ROWVERTYP = 0
+		AND DP.ROWVERTYP = 0
+		AND DP.ROWVERTYP = SMALLINT(0)
+		AND DS.LSTCMPSTP <![CDATA[ <> ]]> 4
+		ORDER BY
+		DS.STETS DESC
+	</select>
+
+	<select id="getRecoverDeploymentSetList" resultType="java.lang.Integer">
+		SELECT DISTINCT PROBSETID FROM DSTSET S WHERE PROBSETID IS NOT NULL AND ROWVERTYP=0
+	</select>
+	<select id="getDeploymentList" parameterType="java.util.Map" resultMap="getDeploymentListResultMap"> 
+		SELECT * FROM (
+		SELECT DISTINCT 
+		S.LSTREQSTP, 
+		S.LSTREQSTAT, 
+		D.DSTSTATCDE,
+		C.CPTRID,
+		C.CPTRNM,
+		T.DSTTGTID,
+		T.DSTTGTNM,
+		P.DSTPRFNM,
+		P.DSTPRFID,
+		S.DSTNTFYTIM, 
+		S.DSTSETNM,
+		S.DSTSETID,
+		COALESCE(E1.ENMVAL, E3.ENMVAL) DSTDESSTP,
+		(CASE WHEN E1.ENMVAL IS NULL THEN COALESCE(E4.ENMVAL,E2.ENMVAL) ELSE COALESCE(E2.ENMVAL,E4.ENMVAL) END) DSTSTATVAL, 
+		COALESCE(D.EFFSTRTS, C.EFFSTRTS) EFFSTRTS 
+		FROM COMPUTER C 
+		LEFT JOIN DSTDES D ON C.CPTRID = D.CPTRID AND D.ROWVERTYP = 0 
+		LEFT JOIN DSTSET S ON S.DSTSETID = D.DSTSETID AND S.ROWVERTYP = 0 
+		LEFT JOIN DSTPRF P ON P.DSTPRFID = S.DSTPRFID AND P.ROWVERTYP = 0 
+		LEFT JOIN DSTTGT T ON T.DSTTGTID = D.DSTTGTID AND T.ROWVERTYP = 0 
+		LEFT JOIN ENMVALS E1 ON D.DSTDESSTP = E1.ENM AND E1.COLNM = 'DSTDESSTP' 
+		LEFT JOIN ENMVALS E2 ON D.DSTSTATCDE = E2.ENM AND E2.COLNM = 'DSTSTATCDE' 
+		LEFT JOIN ENMVALS E3 ON S.LSTCMPSTP = E3.ENM AND E3.COLNM = 'LSTCMPSTP' 
+		LEFT JOIN ENMVALS E4 ON S.LSTCMPSTAT = E4.ENM AND E4.COLNM = 'LSTCMPSTAT' 
+		WHERE C.DSTENG IS NOT NULL AND ( C.DSTENG = 1 OR S.DSTSETID IS NOT NULL ) 
+			AND C.ROWVERTYP = 0 AND (S.LSTCMPSTP IS NULL OR (S.LSTCMPSTP <![CDATA[ <> ]]> 0 AND S.LSTCMPSTP <![CDATA[ <> ]]> 4)) 
+		UNION 
+		SELECT DISTINCT S.LSTREQSTP, S.LSTREQSTAT, D.DSTSTATCDE, C.CPTRID, C.CPTRNM, T.DSTTGTID, T.DSTTGTNM, P.DSTPRFNM, P.DSTPRFID, S.DSTNTFYTIM, S.DSTSETNM,
+		S.DSTSETID, COALESCE(E1.ENMVAL, E3.ENMVAL) DSTDESSTP, 
+		(CASE WHEN E1.ENMVAL IS NULL THEN COALESCE(E4.ENMVAL,E2.ENMVAL) ELSE COALESCE(E2.ENMVAL,E4.ENMVAL) END) DSTSTATVAL,
+		COALESCE(D.EFFSTRTS, S.EFFSTRTS) EFFSTRTS 
+		FROM DSTSET S 
+		JOIN DSTPRF P ON P.DSTPRFID = S.DSTPRFID 
+		LEFT JOIN DSTDES D ON S.DSTSETID = D.DSTSETID AND D.ROWVERTYP = 0
+		LEFT JOIN COMPUTER C ON C.CPTRID = D.CPTRID AND C.ROWVERTYP = 0 
+		LEFT JOIN DSTTGT T ON T.DSTTGTID = D.DSTTGTID AND T.ROWVERTYP = 0 
+		LEFT JOIN ENMVALS E1 ON D.DSTDESSTP = E1.ENM AND E1.COLNM = 'LSTCMPSTP' 
+		LEFT JOIN ENMVALS E2 ON D.DSTSTATCDE = E2.ENM AND E2.COLNM = 'DSTSTATCDE' 
+		JOIN ENMVALS E3 ON S.LSTCMPSTP = E3.ENM AND E3.COLNM = 'LSTCMPSTP' 
+		JOIN ENMVALS E4 ON S.LSTCMPSTAT = E4.ENM AND E4.COLNM = 'LSTCMPSTAT' 
+		WHERE S.ROWVERTYP = 0 AND ( C.DSTENG = 1 OR S.DSTSETID IS NOT NULL ) AND (S.LSTCMPSTP <![CDATA[ <> ]]> 0 AND S.LSTCMPSTP <![CDATA[ <> ]]> 4)
+		ORDER BY EFFSTRTS DESC) A WHERE  TIMESTAMP('${startDate}') <![CDATA[<=]]> TIMESTAMP(A.EFFSTRTS) 
+		AND TIMESTAMP(A.EFFSTRTS) <![CDATA[<=]]> TIMESTAMP('${endDate}')
+
+		<if test="keyword != null and keyword !=''">
+			AND (
+			<choose>
+				<when test='searchScope == "1"'>
+					UPPER(TRIM(CPTRNM)) like #{keyword} ESCAPE '\'
+					OR
+					UPPER(TRIM(DSTTGTNM)) like #{keyword} ESCAPE '\'
+				</when>
+				<when test='searchScope == "2"'>
+					UPPER(TRIM(DSTPRFNM)) like #{keyword} ESCAPE '\'
+				</when>
+				<when test='searchScope == "3"'>
+					UPPER(TRIM(DSTSETNM)) like #{keyword} ESCAPE '\'
+				</when>
+				<otherwise>
+					UPPER(TRIM(CPTRNM)) like #{keyword} ESCAPE '\'
+					OR
+					UPPER(TRIM(DSTTGTNM)) like #{keyword} ESCAPE '\'
+					OR
+					UPPER(TRIM(DSTPRFNM)) like #{keyword} ESCAPE '\'
+					OR
+					UPPER(TRIM(DSTSETNM)) like #{keyword} ESCAPE '\'
+				</otherwise>
+			</choose>
+			)
+		</if>
+		<if test="status != null">
+			AND
+			<choose>
+				<when test="status == 'Timed out'">
+					((DSTSTATCDE is null or DSTSTATCDE=0) AND (DSTNTFYTIM <![CDATA[ <= ]]> TIMESTAMP('2999-01-01 23:59:59') AND DSTNTFYTIM <![CDATA[ >= ]]> TIMESTAMP('2999-01-01 00:00:00')) OR DSTNTFYTIM <![CDATA[ < ]]> TIMESTAMP('${utcDateTime}'))
+				</when>
+				<when test="status == 'Recovered,Restore'">
+					(
+					(DSTDESSTP = 'Restore' AND DSTSTATVAL='Success' AND DSTSETID IS NOT NULL) OR
+					(
+					DSTSETID in (SELECT DISTINCT PROBSETID FROM DSTSET S WHERE PROBSETID IS NOT NULL AND ROWVERTYP=0)
+					AND
+					<!-- Remove timeout items -->
+					(DSTNTFYTIM <![CDATA[ <> ]]> TIMESTAMP('2999-01-01 00:00:00')) AND (DSTNTFYTIM <![CDATA[ >= ]]> TIMESTAMP('${utcDateTime}'))
+					)
+					)
+				</when>
+				<when test="status == 'Backout'">
+					(DSTDESSTP = '${status}' AND DSTSTATVAL='Success')
+				</when>
+				<when test="status == 'Success'">
+					(DSTDESSTP not in ('Restore', 'Deploy', 'Prepare', 'Backout') AND DSTSTATVAL='Success'
+					<!-- Remove recovered item which are storing in DSTSET table -->
+					AND DSTSETID NOT IN (SELECT DISTINCT PROBSETID FROM DSTSET S WHERE PROBSETID IS NOT NULL AND ROWVERTYP=0)
+					)
+				</when>
+				<when test="status == 'Deploy,Prepare'">
+					((DSTDESSTP = 'Deploy' OR DSTDESSTP = 'Prepare') AND DSTSTATVAL='Success'
+					 AND DSTSETID NOT IN (SELECT DISTINCT PROBSETID FROM DSTSET S WHERE PROBSETID IS NOT NULL AND ROWVERTYP=0)
+					)
+				</when>
+				<when test="status == 'Started'">
+					(
+					DSTSTATVAL='Started'
+					AND
+					<!-- Remove timeout items -->
+					(DSTNTFYTIM <![CDATA[ <> ]]> TIMESTAMP('2999-01-01 00:00:00')) AND (DSTNTFYTIM <![CDATA[ >= ]]> TIMESTAMP('${utcDateTime}'))
+					)
+				</when>
+				<when test="status == 'Failed,Canceled,Cancelled,Failure'">
+					DSTSTATVAL in
+					<foreach item="item" index="index" collection='status.split(",")'  open="(" separator="," close=")">
+						#{item}
+					</foreach>
+				</when>
+				<otherwise>
+					DSTSTATVAL = '${status}'
+				</otherwise>
+			</choose>
+
+		</if>
+	</select>
+
+	<select id="getNoneDuplicatedDeploymentsByTargetSQL" resultMap="deploymentSetMap">
+		SELECT DS.DSTSETNM, MAX(DS.dstdesstts) AS DSTDESSTTS FROM
+		(
+			SELECT
+				dset.dstsetnm,
+				ds.dstdesstts
+			FROM
+				dstdes ds
+			JOIN computer c ON
+				c.cptrid = ds.cptrid
+				AND (ds.rowvertyp = 0)
+				AND (c.rowvertyp = 0)
+			JOIN dstset dset ON
+				dset.dstsetid = ds.dstsetid
+				AND (ds.rowvertyp = 0)
+				AND (dset.rowvertyp = 0)
+			WHERE
+				(c.CPTRNM = #{targetId})
+				AND (c.rowvertyp = 0)
+		) DS GROUP BY DS.dstsetnm
+	</select>
+
+	<select id="getDeploymentListByTargetSQL" resultMap="deploymentSetMap">
+		SELECT
+			dstdesid,
+			dset.dstsetnm,
+			ds.dstdesstts,
+			dset.dstntfytim,
+			CAST(ds.dstdesstp AS char(2)) AS dstdesstp,
+			evstp.enmval AS DSTDESSTPNM,
+			CAST(ds.dststatcde AS char(2)) AS dststatcde,
+			(
+			SELECT
+			CAST(count(*) AS char(4))
+			FROM
+			dstset drecv
+			WHERE
+			drecv.probsetid = dset.dstsetid) AS recovcnt
+		FROM
+			dstdes ds
+		JOIN computer c ON
+			c.cptrid = ds.cptrid
+			AND (ds.rowvertyp = SMALLINT(0))
+			AND (c.rowvertyp = SMALLINT(0))
+		JOIN dstset dset ON
+			dset.dstsetid = ds.dstsetid
+			AND (ds.rowvertyp = SMALLINT(0))
+			AND (dset.rowvertyp = SMALLINT(0))
+		JOIN enmvals evstp ON
+			evstp.enm = ds.dstdesstp
+		WHERE
+			(c.CPTRNM = #{targetId})
+			AND (c.rowvertyp = SMALLINT(0))
+			AND evstp.colnbr = 720
+		<if test="deploymentSetIds != null and deploymentSetIds.size > 0">
+			AND dset.dstsetnm in
+			<foreach item="item" index="index" collection='deploymentSetIds'  open="(" separator="," close=")">
+				#{item.name}
+			</foreach>
+		</if>
+		ORDER BY ds.dstdesstts DESC
+	</select>
+
+	<select id="getProfileStepDetails"
+			resultMap="DeploymentProfileStepDetailsMap">
+		SELECT
+		P.DSTPRFID, P.DSTPRFNM, P.DSTPRFDSC, P.AUTOSTR
+		FROM DSTPRF P
+		WHERE P.ROWVERTYP = 0
+		<choose>
+			<when test="prfId != null">
+				AND P.DSTPRFID = ${prfId}
+			</when>
+			<otherwise>
+				AND P.DSTPRFID = -1
+			</otherwise>
+		</choose>
+	</select>
+
+	<resultMap id="deploymentListResultMap"
+						 type="com.rocketsoftware.rdoe.dao.rdoe.model.EnvironmentModel">
+		<result column="DSTPRFID" jdbcType="INTEGER" property="distributionProfileId"/>
+		<result column="DSTPRFNM" jdbcType="CHAR" property="distributionProfileName"/>
+		<result column="ALWDPRFOVR" jdbcType="CHAR" property="distributionProfileOverridable"/>
+		<result column="ENVID" jdbcType="INTEGER" property="envId"/>
+		<result column="ENVTYPAB" jdbcType="CHAR" property="abbreviation"/>
+	</resultMap>
+
+	<select id="getEnvDeployProps"
+					resultMap="deploymentListResultMap">
+		SELECT
+			d.DSTPRFID,
+			d.DSTPRFNM,
+			e.ALWDPRFOVR,
+			e.ENVID,
+			ET.ENVTYPAB
+		FROM
+			ENV e
+		LEFT JOIN DSTPRF d ON
+			d.DSTPRFID = e.DSTPRFID
+			AND d.ROWVERTYP = 0
+		LEFT JOIN ENVTYP ET ON ET.ENVTYPID = E.ENVTYPID AND ET.ROWVERTYP = 0
+		WHERE
+			e.ENVID in
+			<foreach collection="envIds" item="value" open="(" close=")" separator=",">
+	            #{value}
+	        </foreach>
+			AND e.ROWVERTYP = 0
+	</select>
+
+	<resultMap id="computerResultMap" type="com.rocketsoftware.rdoe.controller.vo.deployment.Computer">
+		<result column="CPTRID" jdbcType="VARCHAR" property="id" />
+		<result column="CPTRNM" jdbcType="VARCHAR" property="name" />
+		<result column="CPTRTYP" jdbcType="VARCHAR" property="client" />
+		<result column="DSTENG" jdbcType="VARCHAR" property="deployAllowed" />
+		<result column="OSNM" jdbcType="VARCHAR" property="osName" />
+		<result column="OSID" jdbcType="VARCHAR" property="osId" />
+		<result column="OSVER" jdbcType="VARCHAR" property="osVersion" />
+		<result column="CPTRDSC" jdbcType="VARCHAR" property="description" />
+	</resultMap>
+
+	<select id="getComputerList" parameterType="java.util.Map" resultMap="computerResultMap">
+		SELECT c.CPTRID, c.CPTRNM, c.CPTRTYP, c.DSTENG, o.OSNM, o.OSID, ov.OSVER, c.CPTRDSC
+		FROM COMPUTER c
+		JOIN OPSYS o ON c.OSID = o.OSID
+		LEFT JOIN OPSYSVER ov ON o.OSID = ov.OSID AND ov.OSVERID = c.OSVERID
+		WHERE
+		c.ROWVERTYP =  0
+		<if test="name != null and name != ''">
+			AND (TRIM(UPPER(c.CPTRNM)) LIKE #{name})
+		</if>
+		<if test="description != null and description != ''">
+			AND (TRIM(UPPER(c.CPTRDSC)) LIKE #{description})
+		</if>
+		<if test="osId != null and osId != ''">
+			AND (c.OSID = #{osId})
+		</if>
+		<if test="osVersion != null and osVersion != ''">
+			AND (TRIM(UPPER(ov.OSVER)) LIKE #{osVersion})
+		</if>
+		<if test="deployAllowed != null and deployAllowed != ''">
+			AND (c.DSTENG = #{deployAllowed})
+		</if>
+		<if test="client != null and client != ''">
+			AND (c.CPTRTYP = #{client})
+		</if>
+
+		ORDER BY c.CPTRNMKY
+	</select>
+
+
+	<select id="getComputerCounts" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT COUNT(0)
+		FROM COMPUTER c
+		JOIN OPSYS o ON c.OSID = o.OSID
+		LEFT JOIN OPSYSVER ov ON o.OSID = ov.OSID AND ov.OSVERID = c.OSVERID
+		WHERE c.ROWVERTYP =  0
+		<if test="name != null and name != ''">
+			AND (TRIM(UPPER(c.CPTRNM)) LIKE #{name})
+		</if>
+		<if test="description != null and description != ''">
+			AND (TRIM(UPPER(c.CPTRDSC)) LIKE #{description})
+		</if>
+		<if test="osId != null and osId != ''">
+			AND (c.OSID = #{osId})
+		</if>
+		<if test="osVersion != null and osVersion != ''">
+			AND (TRIM(UPPER(ov.OSVER)) LIKE #{osVersion})
+		</if>
+		<if test="deployAllowed != null and deployAllowed != ''">
+			AND (c.DSTENG = #{deployAllowed})
+		</if>
+		<if test="client != null and client != ''">
+			AND (c.CPTRTYP = #{client})
+		</if>
+	</select>
+
+</mapper>
