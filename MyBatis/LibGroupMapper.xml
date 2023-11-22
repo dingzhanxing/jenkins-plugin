@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rocketsoftware.rdoi.dao.rdoi.mapper.LibGroupMapper">
+  <resultMap id="libGroupResultMap" type="com.rocketsoftware.rdoi.dao.rdoi.model.LibGroupModel">
+    <result column="GRP###" jdbcType="CHAR" property="grpid" />
+    <result column="PRD###" jdbcType="CHAR" property="prdid" />
+    <result column="REL###" jdbcType="CHAR" property="relid" />
+    <result column="LIBGRPNBR" jdbcType="CHAR" property="libgrpnbr" />
+    <result column="LIBNBR" jdbcType="CHAR" property="libnbr" />
+    <result column="LIBGRPTXT" jdbcType="CHAR" property="libgrptxt" />
+    <result column="FILLER" jdbcType="CHAR" property="filler" />
+    <result column="FILLER" jdbcType="CHAR" property="filler" />
+  </resultMap>
+
+    <resultMap id="libGroupAssignmentResultMap" type="com.rocketsoftware.rdoi.dao.rdoi.model.LibGroupAssignmentModel">
+      <result column="GRP###" jdbcType="CHAR" property="grpid" />
+      <result column="PRD###" jdbcType="CHAR" property="prdid" />
+      <result column="REL###" jdbcType="CHAR" property="relid" />
+      <result column="LIBDEFOPT" jdbcType="CHAR" property="libdefopt" />
+      <result column="LIBDEFPGL" jdbcType="CHAR" property="libdefpgl" />
+    </resultMap>
+
+  <select id="getLibGroupByGAR" resultMap="libGroupResultMap">
+    SELECT lp.LIBGRPNBR, lp.LIBNBR, lp.LIBGRPTXT FROM LIBGRP lp
+    <where>
+      <if test="groupId != null">
+        AND lp.GRP### = #{groupId}
+      </if>
+
+      <if test="prdId != null">
+        AND lp.PRD### = #{prdId}
+      </if>
+
+      <if test="relId != null">
+        AND lp.REL### = #{relId}
+      </if>
+    </where>
+  </select>
+
+  <select id="getLibGroupAssignmentByGAR" resultMap="libGroupAssignmentResultMap">
+    SELECT rd.LIBDEFOPT, rd.LIBDEFPGL FROM RELDEF rd
+    <where>
+      <if test="groupId != null">
+        AND rd.GRP### = #{groupId}
+      </if>
+
+      <if test="prdId != null">
+        AND rd.PRD### = #{prdId}
+      </if>
+
+      <if test="relId != null">
+        AND rd.REL### = #{relId}
+      </if>
+    </where>
+  </select>
+</mapper>
